@@ -1,21 +1,24 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Users from './components/Users'
 
+import { useState, useEffect } from 'react'
 import './App.css'
-import Posts from './components/Posts'
-import Todos from './components/Todos'
+import Auth from './pages/Auth'
+import Dashboard from './pages/Dashboard'
 
-const queryClient = new QueryClient()
 function App() {
-
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Users/>
-      <Posts/>
-      <Todos/>
-    </QueryClientProvider>
-  )
+ const [isAuthenticated, setIsAuthenticated] = useState(false)
+ 
+ useEffect(() => {
+  // Check authentication status
+  // For now, we'll just set it to true
+  setIsAuthenticated(false)
+ }, [])
+ 
+ return isAuthenticated ? (
+  <Dashboard />
+ ) : (
+  <Auth />
+ )
+ 
 }
 
 export default App
