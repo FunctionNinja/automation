@@ -1,4 +1,4 @@
-import { Box, TextField, Button } from "@mui/material"
+import { Box, TextField, Button, Typography } from "@mui/material"
 import ShadowBox from "../shared/ui/ShadowBox"
 
 
@@ -11,14 +11,20 @@ const Login = ({ toggleForm }: { toggleForm: () => void }) => {
       <TextField label="Email" variant="outlined" fullWidth />
       <TextField label="Password" type="password" fullWidth />
 
-      <Box 
-      sx={{ display: "flex", flexDirection: "column" }}
+      <Box
+        sx={{ display: "flex", flexDirection: "column" }}
       >
 
-        <Button variant="contained" onClick={() => console.log('ku')}>Login</Button>
-        <Button variant="text">Forgot password?</Button>
-
-        <Button variant="text" onClick={toggleForm}>
+        <Button variant="contained" onClick={() => console.log('ku')} sx={{ mb: 1, width: '50%', alignSelf: 'center' }}>Login</Button>
+        <Button variant="text" sx={{ alignSelf: "flex-end", textTransform: 'none' }}>
+          Forgot password?
+        </Button>
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+        <Typography variant="body2">
+          Don't have an account?
+        </Typography>
+        <Button variant="text" onClick={toggleForm} sx={{ textTransform: 'none' }}>
           Sign up
         </Button>
       </Box>

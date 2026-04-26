@@ -4,6 +4,7 @@ import './App.css'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
 
+
 function App() {
  const [isAuthenticated, setIsAuthenticated] = useState(false)
  

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
-import type { Post } from "../types/Post"
-import { supabase } from "../shared/api/supabaseClient"
+import type { Post } from "../../types/Post"
+import { supabase } from "../../shared/api/supabaseClient"
 
 export default function SupaPost() {
     const { data, isLoading, error } = useQuery({
