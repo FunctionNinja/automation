@@ -2,6 +2,8 @@
 import { Navigate } from "react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "../shared/api/supabaseClient";
+import Loading from "./Loading";
+
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
@@ -23,7 +25,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading/>;
   }
 
   if (!user) {
