@@ -1,6 +1,6 @@
 import { Box, TextField, Button, Typography, Snackbar, Alert } from "@mui/material"
 import ShadowBox from "../../shared/ui/ShadowBox"
-import { supabase } from "../../shared/api/supabaseClient"
+import { supabase } from "../../providers/supabaseClient"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { useNavigate } from "react-router"

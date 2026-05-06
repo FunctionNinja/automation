@@ -2,10 +2,12 @@ import Stack from '@mui/material/Stack';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import CustomDatePicker from './CustomDatePicker';
 import NavbarBreadcrumbs from './NavbarBreadcrumbs';
-import MenuButton from '../sidemenu/MenuButton';
+import MenuButton from '../dashboard/sidemenu/MenuButton';
 // import ColorModeIconDropdown from '../../shared-theme/ColorModeIconDropdown';
 
 import Search from './Search';
+import { Button } from '@mui/material';
+import { logout } from '../../services/logout';
 
 export default function Header() {
   return (
@@ -29,6 +31,7 @@ export default function Header() {
           <NotificationsRoundedIcon />
         </MenuButton>
         {/* <ColorModeIconDropdown /> */}
+        <Button onClick={logout}>Exit</Button>
       </Stack>
     </Stack>
   );

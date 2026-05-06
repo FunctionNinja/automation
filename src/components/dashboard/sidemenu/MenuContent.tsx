@@ -9,14 +9,17 @@ import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentRoundedIcon from '@mui/icons-material/AssignmentRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
 import { NavLink } from 'react-router';
+import { useProfile } from '../../../services/hooks/useProfile';
+import Loading from '../../Loading';
 
 const mainListItems = [
   { text: 'Home', icon: <HomeRoundedIcon />, path: '/dashboard' },
   { text: 'Monitoring', icon: <AnalyticsRoundedIcon />, path: '/dashboard/monitoring' },
-  { text: 'Clients', icon: <PeopleRoundedIcon />, path: '/dashboard/clients' },
+  { text: 'Employees', icon: <PeopleRoundedIcon />, path: '/dashboard/employees' },
   { text: 'Tasks', icon: <AssignmentRoundedIcon />, path: '/dashboard/tasks' },
 ];
 
@@ -27,13 +30,23 @@ const secondaryListItems = [
 ];
 
 export default function MenuContent() {
+  const { data: profile, isLoading } = useProfile();
+  const isAdmin = profile?.role === 'admin';
+
+
+if(isLoading) {
+  return <Loading/>;
+}
+
+
+
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
       <List dense>
         {mainListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <NavLink 
-              to={item.path} 
+            <NavLink
+              to={item.path}
               style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
               end={item.path === '/dashboard'}
             >
@@ -50,8 +63,8 @@ export default function MenuContent() {
       <List dense>
         {secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
-            <NavLink 
-              to={item.path} 
+            <NavLink
+              to={item.path}
               style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
             >
               {({ isActive }) => (
@@ -64,6 +77,27 @@ export default function MenuContent() {
           </ListItem>
         ))}
       </List>
+      {isAdmin && (
+        <List>
+        <ListItem disablePadding sx={{ display: 'block' }}>
+          <NavLink
+            to="/dashboard/admin"
+            style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+          >
+            {({ isActive }) => (
+              <ListItemButton selected={isActive}>
+                <ListItemIcon><AdminPanelSettingsIcon /></ListItemIcon>
+                <ListItemText primary="Admin's page" />
+              </ListItemButton>
+            )}
+          </NavLink>
+        </ListItem>
+      </List>
+      )}
+
+
+
+      
     </Stack>
   );
 }

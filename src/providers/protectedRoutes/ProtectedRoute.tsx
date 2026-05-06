@@ -1,8 +1,8 @@
 // components/ProtectedRoute.tsx
 import { Navigate } from "react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "../shared/api/supabaseClient";
-import Loading from "./Loading";
+import { supabase } from "../supabaseClient";
+import Loading from "../../components/Loading";
 
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

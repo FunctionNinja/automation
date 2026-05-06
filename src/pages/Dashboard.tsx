@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import { Outlet } from 'react-router'; // 👈 импортируй Outlet
 import MenuContent from '../components/dashboard/sidemenu/MenuContent';
-import Header from '../components/dashboard/header/Header';
+import Header from '../components/header/Header';
 
 export default function Dashboard() {
   return (
