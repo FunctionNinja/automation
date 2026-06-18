@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../providers/supabaseClient';
 
-export function useProfile() {
+export const useProfiles = () => {
   return useQuery({
     queryKey: ['profile'],
     queryFn: async () => {

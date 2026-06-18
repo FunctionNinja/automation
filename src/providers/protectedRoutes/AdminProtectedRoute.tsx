@@ -1,5 +1,5 @@
 import { Navigate } from "react-router";
-import { useProfile } from "../../services/hooks/useProfile";
+import { useProfile } from "../../services/hooks/useProfiles";
 
 export default function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
   const { data: profile, isLoading } = useProfile();

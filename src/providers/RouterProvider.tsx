@@ -5,10 +5,11 @@ import Signup from "../components/auth/Signup";
 import { ProtectedRoute } from "./protectedRoutes/ProtectedRoute";
 import AdminProtectedRoute  from "./protectedRoutes/AdminProtectedRoute";
 import NotFound from "../pages/NotFound";
-import Monitoring from "../pages/Monitoring";
+import {Monitoring} from "../pages/monitoring/Monitoring";
 import Home from "../pages/Home";
 import Employees from "../pages/Employees";
 import Admin from "../pages/Admin";
+import {AnnualPlanPage}  from "../pages/monitoring/AnnualPlanPage";
 // import MainGrid from "../components/dashboard/mainGrid/MainGrid";
 
 export const RouterProvider = () => {
@@ -26,7 +27,13 @@ export const RouterProvider = () => {
         }
       >
         <Route index element={<Home />} />
-        <Route path="monitoring" element={<Monitoring />} />
+        <Route path="monitoring" element={<Monitoring />}>
+          <Route index element={<Navigate to="annual-plan" replace />} />
+          <Route path="annual-plan" element={<AnnualPlanPage />} /> 
+          {/* <Route path="processes" element={<ProcessMonitoringPage />} /> */}
+          {/* <Route path="audit" element={<AuditPage />} /> */}
+          {/* <Route path="prescriptions" element={<PrescriptionsPage />} /> */}
+        </Route>
         <Route path="employees" element={<Employees />} />
         <Route path="admin" element={<AdminProtectedRoute><Admin /></AdminProtectedRoute>} />
 
