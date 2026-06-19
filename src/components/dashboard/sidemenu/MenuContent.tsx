@@ -110,6 +110,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import AnalyticsRoundedIcon from '@mui/icons-material/AnalyticsRounded';
@@ -126,7 +127,7 @@ import TimelineRoundedIcon from '@mui/icons-material/TimelineRounded';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import ReportRoundedIcon from '@mui/icons-material/ReportRounded';
 import { NavLink, useLocation } from 'react-router';
-import { useProfile } from '../../../services/hooks/useProfiles';
+import { useProfile } from '../../../services/hooks/useProfile';
 import Loading from '../../Loading';
 
 // Основные пункты меню
@@ -170,7 +171,7 @@ export default function MenuContent() {
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}>
       <List dense>
-        {/* Home */}
+        {/* Основные пункты меню */}
         {mainListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
             <NavLink
@@ -188,8 +189,8 @@ export default function MenuContent() {
           </ListItem>
         ))}
 
-        {/* Monitoring с выпадающим списком */}
-        <ListItem disablePadding sx={{ display: 'block', flexDirection: 'column' }}>
+        {/* Monitoring с выпадающим списком - используем Box вместо ListItem */}
+        <Box sx={{ display: 'block' }}>
           <ListItemButton onClick={handleMonitoringClick}>
             <ListItemIcon>
               <AnalyticsRoundedIcon />
@@ -201,10 +202,15 @@ export default function MenuContent() {
           <Collapse in={openMonitoring} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {monitoringSubItems.map((subItem, index) => (
-                <ListItem key={index} disablePadding >
+                <ListItem key={index} disablePadding sx={{ pl: 2 }}>
                   <NavLink
                     to={subItem.path}
-                    style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}
+                    style={{ 
+                      textDecoration: 'none', 
+                      color: 'inherit', 
+                      display: 'block', 
+                      width: '100%' 
+                    }}
                   >
                     {({ isActive }) => (
                       <ListItemButton selected={isActive} sx={{ pl: 4 }}>
@@ -217,9 +223,9 @@ export default function MenuContent() {
               ))}
             </List>
           </Collapse>
-        </ListItem>
+        </Box>
 
-        {/* Остальные пункты */}
+        {/* Вторичные пункты меню */}
         {secondaryListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: 'block' }}>
             <NavLink
@@ -258,4 +264,3 @@ export default function MenuContent() {
     </Stack>
   );
 }
-

@@ -20,34 +20,24 @@ import {
   DialogActions,
   FormControl,
   InputLabel,
-  Chip,
   CircularProgress,
   Alert,
   IconButton,
   Tooltip,
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { useAnnualPlan, useDeletePlanTask } from '@/services/hooks/useAnnualPlan';
-import { useCreatePlanTask } from '@/services/hooks/useAnnualPlan';
-import { useUpdatePlanTask } from '@/services/hooks/useAnnualPlan';
-import { useProfile } from '@/services/hooks/useProfile';
+import {
+  useAnnualPlan,
+  useDeletePlanTask,
+  useCreatePlanTask,
+  useUpdatePlanTask
+} from '@/services/hooks/useAnnualPlan';
+import { useProfiles } from '@/services/hooks/useProfileList';
 import { useAuth } from '@/services/hooks/useAuth';
+import { supabase } from '@/providers/supabaseClient';
+import type { Profile } from '@/types/profile';
 
-const statusColors: Record<string, 'default' | 'primary' | 'success' | 'error' | 'warning'> = {
-  not_started: 'default',
-  in_progress: 'primary',
-  completed: 'success',
-  cancelled: 'error',
-};
-
-const statusLabels: Record<string, string> = {
-  not_started: 'Не начато',
-  in_progress: 'В процессе',
-  completed: 'Завершено',
-  cancelled: 'Отменено',
-};
-
-export default function AnnualPlanPage() {
+export const AnnualPlanPage = () => {
   const { user } = useAuth();
   const [userGroupId, setUserGroupId] = useState<number | undefined>();
   const [userRole, setUserRole] = useState<string>('user');
@@ -65,24 +55,26 @@ export default function AnnualPlanPage() {
   // Получаем профиль пользователя
   useEffect(() => {
     if (user) {
-      import('@/providers/supabaseClient').then(({ supabase }) => {
-        supabase
-          .from('profiles')
-          .select('group_id, role')
-          .eq('id', user.id)
-          .single()
-          .then(({ data }) => {
-            if (data) {
-              setUserGroupId(data.group_id);
-              setUserRole(data.role);
-            }
-          });
-      });
+      supabase
+        .from('profiles')
+        .select('group_id, role')
+        .eq('id', user.id)
+        .single()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Error fetching user profile:', error);
+            return;
+          }
+          if (data) {
+            setUserGroupId(data.group_id);
+            setUserRole(data.role);
+          }
+        });
     }
   }, [user]);
 
   const { data: tasks, isLoading, error } = useAnnualPlan(userGroupId);
-  const { data: profiles } = useProfiles(userGroupId);
+  const { data: profiles, isLoading: profilesLoading } = useProfiles();
   const createTask = useCreatePlanTask();
   const updateTask = useUpdatePlanTask();
   const deleteTask = useDeletePlanTask();
@@ -90,27 +82,64 @@ export default function AnnualPlanPage() {
   const canEdit = userRole === 'admin' || userRole === 'group_lead';
 
   const handleStatusChange = async (id: number, status: string) => {
-    await updateTask.mutateAsync({ id, status: status as any });
+    try {
+      await updateTask.mutateAsync({ id, status: status as any });
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
   };
 
   const handleActualResultChange = async (id: number, value: string) => {
-    await updateTask.mutateAsync({ id, actual_result: value });
+    try {
+      await updateTask.mutateAsync({ id, actual_result: value });
+    } catch (error) {
+      console.error('Error updating actual result:', error);
+    }
   };
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Вы уверены, что хотите удалить задачу?')) {
-      await deleteTask.mutateAsync(id);
+      try {
+        await deleteTask.mutateAsync(id);
+      } catch (error) {
+        console.error('Error deleting task:', error);
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Проверяем, что пользователь авторизован
+    if (!user) {
+      alert('Пользователь не авторизован');
+      return;
+    }
+
+    // Проверяем обязательные поля
+    if (!formData.task) {
+      alert('Поле "Задача" обязательно для заполнения');
+      return;
+    }
+
     try {
-      await createTask.mutateAsync({
-        ...formData,
+      const taskData = {
+        task: formData.task,
+        plan_item: formData.plan_item || null,
+        measure: formData.measure || null,
+        resource: formData.resource || null,
+        deadline: formData.deadline || null,
+        responsible_person: formData.responsible_person || null,
+        expected_result: formData.expected_result || null,
         group_id: userGroupId || 1,
         status: 'not_started',
-      });
+        created_by: user.id, // ✅ Добавляем ID текущего пользователя
+      };
+
+      console.log('📝 Creating task:', taskData);
+
+      await createTask.mutateAsync(taskData);
+
       setOpenDialog(false);
       setFormData({
         task: '',
@@ -122,13 +151,19 @@ export default function AnnualPlanPage() {
         expected_result: '',
       });
     } catch (error) {
-      console.error('Ошибка создания задачи:', error);
+      console.error('❌ Ошибка создания задачи:', error);
+      alert('Ошибка при создании задачи. Подробности в консоли.');
     }
   };
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+      <Box sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "400px"
+      }}>
         <CircularProgress />
       </Box>
     );
@@ -136,7 +171,7 @@ export default function AnnualPlanPage() {
 
   if (error) {
     return (
-      <Box p={3}>
+      <Box sx={{ p: 3 }}>
         <Alert severity="error">Ошибка загрузки данных: {error.message}</Alert>
       </Box>
     );
@@ -145,7 +180,14 @@ export default function AnnualPlanPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       {/* Заголовок и кнопка добавления */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          mb: 3,
+        }}
+      >
         <Typography variant="h4" component="h1">
           Годовой план
         </Typography>
@@ -254,7 +296,7 @@ export default function AnnualPlanPage() {
         <DialogTitle>Новая задача</DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
-            <Box display="flex" flexDirection="column" gap={2} sx={{ pt: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
               <TextField
                 label="Задача"
                 required
@@ -286,7 +328,11 @@ export default function AnnualPlanPage() {
                 label="Срок выполнения"
                 type="date"
                 fullWidth
-                InputLabelProps={{ shrink: true }}
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
                 value={formData.deadline}
                 onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
               />
@@ -298,11 +344,15 @@ export default function AnnualPlanPage() {
                   label="Ответственный"
                 >
                   <MenuItem value="">Не выбран</MenuItem>
-                  {profiles?.map((profile) => (
-                    <MenuItem key={profile.id} value={profile.id}>
-                      {profile.fullname} ({profile.email})
-                    </MenuItem>
-                  ))}
+                  {profilesLoading ? (
+                    <MenuItem disabled>Загрузка...</MenuItem>
+                  ) : (
+                    profiles?.map((profile: Profile) => (
+                      <MenuItem key={profile.id} value={profile.id}>
+                        {profile.fullname} ({profile.email})
+                      </MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
               <TextField
@@ -325,4 +375,4 @@ export default function AnnualPlanPage() {
       </Dialog>
     </Container>
   );
-}
+};

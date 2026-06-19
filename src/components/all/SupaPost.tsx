@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import type { Post } from "../../types/Post"
+import type { Post } from "../../types/weak/Post"
 import { supabase } from "../../providers/supabaseClient"
 
 export default function SupaPost() {
